@@ -1,0 +1,9 @@
+# PEQ Configurator - Python dependencies
+kivy==2.3.0
+# For Android build
+# buildozer==1.5.0
+# cython==3.0.0
+
+# For JSON handling (built-in)
+# For file operations (built-in)
+# For datetime (built-in)
