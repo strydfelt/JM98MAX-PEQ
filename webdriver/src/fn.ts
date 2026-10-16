@@ -124,6 +124,7 @@ export async function connectToDevice() {
 		const devices = await navigator.hid.requestDevice({
 			filters: [
 				{ vendorId: 0x661 }, // JCally / Generic Savitech
+				{ vendorId: 0x666 }, // JCally 98 MAX I received - USB\VID_0666&PID_0881&MI_01\7&2f81564d&0&0001
 				{ vendorId: 0x262a }, // Savitech Official (Fosi, iBasso, Fiio KA series)
 				{ vendorId: 0x2fc6 }, // Comtrue CT7601 (Moondrop, Tanchjim - Protocol might differ!)
 			],
