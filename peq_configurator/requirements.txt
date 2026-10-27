@@ -1,5 +1,8 @@
 # PEQ Configurator - Python dependencies
 kivy==2.3.0
+# USB HID communication for desktop (Windows/Linux)
+hidapi==0.14.0
+
 # For Android build
 # buildozer==1.5.0
 # cython==3.0.0

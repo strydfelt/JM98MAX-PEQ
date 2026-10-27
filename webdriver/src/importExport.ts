@@ -40,6 +40,7 @@ export function textToEqState(text: string): {eqState: EQ, globalGain: number} |
   const lines = text.trim().split('\n');
   const eqState: EQ = [];
   let globalGain = 0;
+  let foundPreampOrFilter = false;
   
   for (const line of lines) {
     const trimmed = line.trim();
@@ -50,6 +51,7 @@ export function textToEqState(text: string): {eqState: EQ, globalGain: number} |
       const match = trimmed.match(/Preamp:\s*(-?\d+\.?\d*)\s*dB/);
       if (match) {
         globalGain = parseFloat(match[1]);
+        foundPreampOrFilter = true;
       }
       continue;
     }
@@ -83,8 +85,14 @@ export function textToEqState(text: string): {eqState: EQ, globalGain: number} |
           eqState[index].gain = gain;
           eqState[index].q = q;
         }
+        foundPreampOrFilter = true;
       }
     }
+  }
+  
+  // If we didn't find any Preamp or Filter lines, return null to indicate invalid PEQ format
+  if (!foundPreampOrFilter) {
+    return null;
   }
   
   // Fill any missing bands with defaults
@@ -123,7 +131,7 @@ export async function exportProfile() {
 }
 
 /**
- * Import profile from text file
+ * Import profile from file (supports both PEQ text format and legacy JSON format)
  * @param e The event object
  */
 export async function importProfile(e: Event) {
@@ -135,7 +143,35 @@ export async function importProfile(e: Event) {
   reader.onload = (event) => {
     try {
       const text = event.target?.result as string;
-      const result = textToEqState(text);
+      
+      // Try to parse as PEQ text format first
+      let result = textToEqState(text);
+      
+      // If PEQ parsing fails and it's a JSON file, try legacy JSON format
+      if (!result && file.name.endsWith('.json')) {
+        try {
+          const data = JSON.parse(text);
+          if (data.bands) {
+            // Convert legacy JSON format to our EQ state format
+            const eqState: EQ = data.bands.map((band: any, index: number) => ({
+              index: band.index || index,
+              freq: band.freq || (index === 0 ? 26 : index === 1 ? 40 : index === 2 ? 120 : index === 3 ? 460 : index === 4 ? 1700 : index === 5 ? 4600 : index === 6 ? 5900 : 7800),
+              gain: band.gain || 0,
+              q: band.q || 0.75,
+              type: band.type || 'PK',
+              enabled: band.enabled !== undefined ? band.enabled : true
+            }));
+            
+            result = {
+              eqState,
+              globalGain: data.globalGain || 0
+            };
+          }
+        } catch (jsonErr) {
+          // JSON parsing failed, continue to PEQ parsing attempt below
+        }
+      }
+      
       if (result && result.eqState) {
         // Update internal state
         setEqState(result.eqState);
@@ -148,7 +184,7 @@ export async function importProfile(e: Event) {
 
         log("Profile imported. Click 'SYNC' to apply.");
       } else {
-        log("Error: Could not parse PEQ file format");
+        log("Error: Could not parse file format. Please ensure it's a valid PEQ (.txt) or JSON (.json) file.");
       }
     } catch (err) {
       log(`Parse Error: ${(err as Error).message}`);

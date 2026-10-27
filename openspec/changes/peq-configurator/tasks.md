@@ -46,6 +46,18 @@
 - [x] 7.2 Implement application settings menu and verify persistent storage of user preferences
 - [x] 7.3 Add error handling and logging throughout application and verify errors are properly reported
 - [x] 7.4 Optimize application performance for Android devices and verify smooth operation on target hardware
+
+## 8. USB HID Communication Implementation
+
+- [x] 8.1 Add USB HID dependencies (hidapi for desktop, pyjnius for Android) to requirements and buildozer.spec
+- [x] 8.2 Implement desktop USB HID backend using hidapi for Windows/Linux testing
+- [x] 8.3 Implement Android USB HID backend using pyjnius (Android USB Host API)
+- [x] 8.4 Create device_filter.xml for USB device matching (VID: 0x0661, 0x0666, 0x262A, 0x2FC6)
+- [x] 8.5 Update buildozer.spec with android.features, android.res_xml, and required permissions
+- [x] 8.6 Integrate USB backend selection (Android vs Desktop) in DeviceService
+- [x] 8.7 Implement read_config, apply_config, save_to_flash with actual USB communication
+- [ ] 8.8 Test USB communication on desktop with physical device
+
 - [ ] 7.5 Test application on physical Android device connected to JM98 Max DAC/AMP and verify all core functions work as expected
 
 ## Workflow follow-up

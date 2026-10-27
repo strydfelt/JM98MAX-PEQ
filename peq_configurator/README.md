@@ -110,6 +110,131 @@ peq_configurator/
     └── test_device_service.py   # Device service tests (13 tests)
 ```
 
+## Running and debugging
+
+### Basic Run
+
+```sh
+uv run python main.py
+```
+
+### Debug Logging
+
+Enable verbose Kivy logging to see detailed USB communication:
+
+```bash
+# Windows (PowerShell)
+$env:KIVY_LOG_LEVEL="debug"
+uv run python main.py
+
+# Windows (cmd)
+set KIVY_LOG_LEVEL=debug && uv run python main.py
+
+# Linux/macOS
+KIVY_LOG_LEVEL=debug uv run python main.py
+```
+
+Logs output to:
+- **Console** - Real-time INFO/WARNING/ERROR
+- **Log files** - `%USERPROFILE%\.kivy\logs\kivy_YY-MM-DD_#.txt` (Windows) or `~/.kivy/logs/` (Linux/macOS)
+
+Additional useful environment variables:
+```bash
+# Use Python's logging module format
+KIVY_LOG_MODE=python
+
+# Graphics debugging
+KIVY_GRAPHICS_DEBUG=1
+```
+
+### VS Code Debugging (Breakpoints, Step-through)
+
+Create `.vscode/launch.json` in the `peq_configurator` folder:
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: PEQ Configurator",
+            "type": "python",
+            "request": "launch",
+            "module": "peq_configurator.main",
+            "cwd": "${workspaceFolder}/peq_configurator",
+            "console": "integratedTerminal",
+            "env": {
+                "KIVY_LOG_LEVEL": "debug",
+                "PYTHONPATH": "${workspaceFolder}/peq_configurator/src"
+            }
+        }
+    ]
+}
+```
+
+Then:
+1. Set breakpoints in `src/services/device_service.py`, `src/peq_app.py`, or any screen
+2. Press **F5** to start debugging
+
+### Remote Debugging with debugpy
+
+```bash
+# Install debugpy
+uv pip install debugpy
+
+# Run app waiting for debugger attachment
+uv run python -m debugpy --listen 5678 --wait-for-client main.py
+```
+
+VS Code attach configuration:
+```json
+{
+    "name": "Python: Attach to PEQ Configurator",
+    "type": "python",
+    "request": "attach",
+    "connect": {"host": "localhost", "port": 5678},
+    "pathMappings": [
+        {"localRoot": "${workspaceFolder}/peq_configurator", "remoteRoot": "."}
+    ]
+}
+```
+
+### Kivy Inspector (UI Debugging)
+
+While the app is running:
+- Press **F12** or **Ctrl+I** to open the widget inspector
+- Inspect widget tree, properties, and layout
+
+### In-Code Logging
+
+The `DeviceService` uses structured logging:
+```python
+from kivy.logger import Logger
+
+Logger.debug("DeviceService: Sending packet: %s", packet[:10])
+Logger.info("DeviceService: Connected to JM98 Max")
+Logger.warning("DeviceService: No device found")
+Logger.error("DeviceService: USB write failed: %s", e)
+```
+
+### Android Device Debugging
+
+```bash
+# View logs on connected Android device
+adb logcat *:S python:V kivy:V
+
+# Filter for USB permission requests
+adb logcat | grep -i usb
+
+# Install debug APK (built with android.debug = True in buildozer.spec)
+adb install -r bin/peqconfigurator-*-debug.apk
+```
+
+Build debug APK:
+```bash
+# In buildozer.spec: android.debug = True
+./build_android.sh debug
+```
+
 ## Building
 
 ### Windows Executable (PyInstaller)
