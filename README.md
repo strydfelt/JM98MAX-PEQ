@@ -1,6 +1,6 @@
 # Oh, hello.
 
-This is based of a fork from https://github.com/erikyo/JM98MAX-PEQ
+This is based of a fork from [https://github.com/erikyo/JM98MAX-PEQ](https://github.com/erikyo/JM98MAX-PEQ)
 Full credits to him for figuring out how to write the config to flash etc.
 
 I just added

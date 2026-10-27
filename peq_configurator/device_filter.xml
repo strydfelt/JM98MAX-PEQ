@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- JCally / Generic Savitech (VID: 0x0661) -->
+    <usb-device vendor-id="1633" />
+    <!-- JCally JM98 MAX (VID: 0x0666) -->
+    <usb-device vendor-id="1638" />
+    <!-- Savitech Official - Fosi, iBasso, Fiio KA series (VID: 0x262A) -->
+    <usb-device vendor-id="9770" />
+    <!-- Comtrue CT7601 - Moondrop, Tanchjim (VID: 0x2FC6) -->
+    <usb-device vendor-id="12230" />
+</resources>
