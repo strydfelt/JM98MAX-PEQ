@@ -1,4 +1,4 @@
-import { DEFAULT_FREQS, DEFAULT_LABELS } from "./constants.ts";
+import { DEFAULT_FREQS, getLabelForFrequency } from "./constants.ts";
 import { readDeviceParams, setupListener, syncToDevice } from "./dsp.ts";
 import { enableControls, log, updateGlobalGainUI } from "./helpers.ts";
 import type { Band, EQ } from "./main.ts";
@@ -81,7 +81,7 @@ export function renderUI(eqState: EQ) {
 		div.className = `eq-strip ${band.enabled ? "" : "bypassed"}`;
 		div.innerHTML = `
                 <h3>BAND ${i + 1}</h3>
-                <div class="freq-label">${DEFAULT_LABELS[i]}</div>
+                <div class="freq-label" id="label-${i}">${getLabelForFrequency(band.freq)}</div>
                 
                 <label class="switch">
                     <input type="checkbox" ${band.enabled ? "checked" : ""} onchange="toggleBand(${i}, this.checked)" ${device ? "" : "disabled"}>
@@ -220,6 +220,12 @@ export function updateState(
 			`#num-gain-${index}`,
 		);
 		if (currentGain) currentGain.value = value.toString();
+	}
+
+	// Update frequency label dynamically when frequency changes
+	if (key === "freq") {
+		const labelEl = document.getElementById(`label-${index}`);
+		if (labelEl) labelEl.textContent = getLabelForFrequency(value as number);
 	}
 }
 

@@ -31,7 +31,7 @@ class TestPEQBand:
         band = PEQBand.create_default(index)
         assert band.index == index
         assert band.freq == expected_freq
-        assert band.get_label() == PEQBand.DEFAULT_LABELS[index]
+        assert band.get_label() == PEQBand.get_label_for_freq(expected_freq)
     
     def test_to_dict(self):
         """Test serialization to dictionary."""
@@ -69,14 +69,25 @@ class TestPEQBand:
         assert band is not band_copy
     
     def test_get_label(self):
-        """Test getting band label."""
-        band = PEQBand.create_default(0)
-        assert band.get_label() == "Sub-Bass"
-        band = PEQBand.create_default(7)
-        assert band.get_label() == "Air"
-        # Out of range
-        band = PEQBand(index=10, freq=1000, gain=0, q=1, type="PK")
-        assert band.get_label() == "Band 11"
+        """Test getting band label based on frequency."""
+        # Test default frequencies match expected labels
+        for i, freq in enumerate(PEQBand.DEFAULT_FREQS):
+            band = PEQBand(index=i, freq=freq, gain=0, q=1, type="PK")
+            assert band.get_label() == PEQBand.get_label_for_freq(freq)
+        
+        # Test specific frequency ranges
+        assert PEQBand.get_label_for_freq(30) == "Sub-Bass"
+        assert PEQBand.get_label_for_freq(100) == "Bass"
+        assert PEQBand.get_label_for_freq(300) == "Low-Mids"
+        assert PEQBand.get_label_for_freq(1000) == "Mids"
+        assert PEQBand.get_label_for_freq(3000) == "High-Mids"
+        assert PEQBand.get_label_for_freq(5000) == "Upper Mids"
+        assert PEQBand.get_label_for_freq(8000) == "Presence"
+        assert PEQBand.get_label_for_freq(16000) == "Air"
+        
+        # Test edge cases
+        assert PEQBand.get_label_for_freq(20000) == "Air"
+        assert PEQBand.get_label_for_freq(10) == "Freq 10 Hz"  # Below range
 
 
 class TestPEQConfiguration:

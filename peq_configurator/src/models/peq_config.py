@@ -24,6 +24,19 @@ class PEQBand:
         "Mids", "High-Mids", "Presence", "Air"
     ]
     
+    # Frequency ranges for automatic label detection
+    # (min_freq, max_freq, label)
+    FREQ_LABEL_RANGES = [
+        (20, 60, "Sub-Bass"),
+        (60, 250, "Bass"),
+        (250, 500, "Low-Mids"),
+        (500, 2000, "Mids"),
+        (2000, 4000, "High-Mids"),
+        (4000, 6000, "Upper Mids"),
+        (6000, 10000, "Presence"),
+        (10000, 20000, "Air"),
+    ]
+    
     @classmethod
     def create_default(cls, index: int) -> 'PEQBand':
         """Create a default band for the given index."""
@@ -64,10 +77,24 @@ class PEQBand:
         return deepcopy(self)
     
     def get_label(self) -> str:
-        """Get the display label for this band."""
-        if self.index < len(self.DEFAULT_LABELS):
-            return self.DEFAULT_LABELS[self.index]
+        """Get the display label for this band based on frequency."""
+        for min_freq, max_freq, label in self.FREQ_LABEL_RANGES:
+            if min_freq <= self.freq < max_freq:
+                return label
+        # Handle edge case for exactly 20000 Hz
+        if self.freq >= 20000:
+            return "Air"
         return f"Band {self.index + 1}"
+    
+    @classmethod
+    def get_label_for_freq(cls, freq: float) -> str:
+        """Get the label for a given frequency (static method)."""
+        for min_freq, max_freq, label in cls.FREQ_LABEL_RANGES:
+            if min_freq <= freq < max_freq:
+                return label
+        if freq >= 20000:
+            return "Air"
+        return f"Freq {int(freq)} Hz"
 
 
 @dataclass

@@ -31,3 +31,35 @@ export const DEFAULT_LABELS = [
 	"Presence",
 	"Air",
 ];
+
+/**
+ * Frequency ranges for automatic label detection
+ * Matches PEQBand.FREQ_LABEL_RANGES in peq_configurator/src/models/peq_config.py
+ * (min_freq, max_freq, label) - inclusive min, exclusive max
+ */
+const FREQ_LABEL_RANGES: Array<[number, number, string]> = [
+	[20, 60, "Sub-Bass"],
+	[60, 250, "Bass"],
+	[250, 500, "Low-Mids"],
+	[500, 2000, "Mids"],
+	[2000, 4000, "High-Mids"],
+	[4000, 6000, "Upper Mids"],
+	[6000, 10000, "Presence"],
+	[10000, 20000, "Air"],
+];
+
+/**
+ * Get the label for a given frequency based on standard audio frequency ranges
+ * @param freq Frequency in Hz
+ * @returns Label string for the frequency range
+ */
+export function getLabelForFrequency(freq: number): string {
+	for (const [minFreq, maxFreq, label] of FREQ_LABEL_RANGES) {
+		if (freq >= minFreq && freq < maxFreq) {
+			return label;
+		}
+	}
+	// Handle edge case for exactly 20000 Hz
+	if (freq >= 20000) return "Air";
+	return `Freq ${Math.round(freq)} Hz`;
+}

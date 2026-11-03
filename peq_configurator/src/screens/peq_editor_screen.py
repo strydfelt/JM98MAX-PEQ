@@ -39,14 +39,14 @@ class PEQBandEditor(BoxLayout):
         # Header with band number and label
         header = BoxLayout(orientation='horizontal', size_hint_y=None, height=dp(30))
         
-        label = Label(
+        self.label = Label(
             text=f'Band {self.band.index + 1}: {self.band.get_label()}',
             font_size=dp(16),
             bold=True,
             halign='left'
         )
-        label.bind(size=label.setter('text_size'))
-        header.add_widget(label)
+        self.label.bind(size=self.label.setter('text_size'))
+        header.add_widget(self.label)
         
         # Enabled checkbox
         self.enabled_checkbox = CheckBox(active=self.band.enabled, size_hint_x=None, width=dp(50))
@@ -146,6 +146,8 @@ class PEQBandEditor(BoxLayout):
         """Handle frequency slider change."""
         self.band.freq = value
         self.freq_input.text = str(int(value))
+        # Update label to reflect new frequency-based label
+        self.label.text = f'Band {self.band.index + 1}: {self.band.get_label()}'
         if self.on_change_callback:
             self.on_change_callback(self.band)
     
@@ -156,6 +158,8 @@ class PEQBandEditor(BoxLayout):
             if 20 <= value <= 20000:
                 self.band.freq = value
                 self.freq_slider.value = value
+                # Update label to reflect new frequency-based label
+                self.label.text = f'Band {self.band.index + 1}: {self.band.get_label()}'
                 if self.on_change_callback:
                     self.on_change_callback(self.band)
         except ValueError:
